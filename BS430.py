@@ -117,10 +117,8 @@ while True:
     wait_for_device(device_name)
     device = connect_device(ble_address)
     if device:
+        handle_command = device.get_handle(Char_command)
         weightdata = []
-        try:
-            handle_weight = device.get_handle(Char_weight)
-            continue_comms = True
         except pygatt.exceptions.NotConnectedError:
             log.warning('Error getting handles')
             continue_comms = False
@@ -160,3 +158,5 @@ while True:
                     log.info(f"Most recent weight data: {weightdata[0]}")
                 else:
                     log.error('Unreliable data received. Unable to process')
+    time.sleep(5)
+adapter.stop()
