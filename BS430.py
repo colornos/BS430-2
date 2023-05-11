@@ -24,6 +24,7 @@ def decodeWeight(handle, values):
     retDict["person"] = data[3]
     return retDict
 
+
 # Load the functions from the original script
 def init_ble_mode():
     global ble_mode
@@ -31,6 +32,7 @@ def init_ble_mode():
 
     log.info('BLE mode set to: %s' % ble_mode)
     return True
+
 
 def wait_for_device(device_name):
     log.info('Waiting for device %s to become available...' % device_name)
@@ -42,7 +44,8 @@ def wait_for_device(device_name):
                 return
         time.sleep(3)
 
- def connect_device(ble_address):
+
+def connect_device(ble_address):
     global device
     device = None
     while device is None:
