@@ -6,6 +6,24 @@ from struct import pack
 
 import pygatt
 
+# Relevant characteristics submitted by the scale
+# (Explanation see below)
+Char_person = '00008a82-0000-1000-8000-00805f9b34fb'  # person data
+Char_weight = '00008a21-0000-1000-8000-00805f9b34fb'  # weight data
+Char_body = '00008a22-0000-1000-8000-00805f9b34fb'  # body data
+Char_command = '00008a81-0000-1000-8000-00805f9b34fb'  # command register
+
+def decodeWeight(handle, values):
+    data = unpack('<BHxxIxxxxB', bytes(values[0:14]))
+    retDict = {}
+    retDict["valid"] = (data[0] == 0x1d)
+    # Weight is reported in 10g. Hence, divide by 100.0
+    # To force results to be floats: devide by float.
+    retDict["weight"] = data[1]/100.0
+    retDict["timestamp"] = sanitize_timestamp(data[2])
+    retDict["person"] = data[3]
+    return retDict
+
 # Load the functions from the original script
 def init_ble_mode():
     global ble_mode
