@@ -119,6 +119,9 @@ while True:
     if device:
         handle_command = device.get_handle(Char_command)
         weightdata = []
+        try:  # Add the try block
+            handle_weight = device.get_handle(Char_weight)
+            continue_comms = True
         except pygatt.exceptions.NotConnectedError:
             log.warning('Error getting handles')
             continue_comms = False
