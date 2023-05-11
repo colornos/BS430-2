@@ -57,6 +57,7 @@ def connect_device(ble_address):
             time.sleep(1)
     return device
 
+handle_command = device.get_handle(Char_command)
 # Read .ini file and set plugins-folder
 config = ConfigParser()
 config.read('BS430.ini')
