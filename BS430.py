@@ -7,7 +7,34 @@ from struct import pack
 import pygatt
 
 # Load the functions from the original script
-from bs440_functions import init_ble_mode, wait_for_device, connect_device, decodeWeightData
+def init_ble_mode():
+    global ble_mode
+    ble_mode = 'Indication'
+
+    log.info('BLE mode set to: %s' % ble_mode)
+    return True
+
+def wait_for_device(device_name):
+    log.info('Waiting for device %s to become available...' % device_name)
+    while True:
+        devices = adapter.scan(run_as_root=True, timeout=3)
+        for dev in devices:
+            if dev['name'] == device_name:
+                log.info('Found %s' % device_name)
+                return
+        time.sleep(3)
+
+ def connect_device(ble_address):
+    global device
+    device = None
+    while device is None:
+        try:
+            device = adapter.connect(ble_address, address_type=addresstype)
+            log.info('Connected to device %s' % ble_address)
+        except pygatt.exceptions.NotConnectedError:
+            log.warning('Failed to connect, retrying...')
+            time.sleep(1)
+    return device
 
 # Read .ini file and set plugins-folder
 config = ConfigParser()
