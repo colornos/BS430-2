@@ -14,19 +14,16 @@ class Plugin:
         # put any commands here you would like to be run to initialize your plugin
         return
 
-    def execute(self, globalconfig, persondata, most_recent_weightdata):
+    def execute(self, config, weightdata):
+        # self.weightdata = weightdata
         # --- part of plugin skeleton
-        # your plugin receives the config details from BS440.ini as well as
-        # the most recent weight data received from the scale
         log = logging.getLogger(__name__)
         log.info('Starting plugin: ' + __name__)
-        #read ini file from same location as plugin resides, named [pluginname].ini
+        # read ini file from same location as plugin resides, named [pluginname].ini
         configfile = os.path.dirname(os.path.realpath(__file__)) + '/' + __name__ + '.ini'
         pluginconfig = ConfigParser()
         pluginconfig.read(configfile)
         log.info('ini read from: ' + configfile)
-        # Thats it! From here do your thing with the data.
-        # Be sure to catch and log errors if you're doing risky stuff
         # --- start plugin specifics here
         device = '104019001'
         f1 = open("rfid.txt", "r")
@@ -44,7 +41,7 @@ class Plugin:
             print("No card detected!")
 
         else:
-            weight = most_recent_weightdata['weight']
+            weight = weightdata['weight']
             headers = {
                 'User-Agent': 'RaspberryPi/BS430.py',
                 'Content-Type': 'application/x-www-form-urlencoded'
