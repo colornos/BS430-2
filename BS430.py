@@ -44,9 +44,8 @@ def wait_for_device(device_name):
                 return
         time.sleep(3)
 
-
 def connect_device(ble_address):
-    global device
+    global device, handle_command  # Add handle_command to the list of global variables
     device = None
     while device is None:
         try:
@@ -55,7 +54,7 @@ def connect_device(ble_address):
         except pygatt.exceptions.NotConnectedError:
             log.warning('Failed to connect, retrying...')
             time.sleep(1)
-    handle_command = device.get_handle(Char_command)  # Move this line inside the connect_device() function
+    handle_command = device.get_handle(Char_command)
     return device
 
 handle_command = device.get_handle(Char_command)
