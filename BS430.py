@@ -24,10 +24,12 @@ def sanitize_timestamp(timestamp):
     return retTS
 
 def decodeWeight(handle, values):
-    data = unpack('<BHHxxxxxIH', bytes(values[0:16]))
+    data = unpack('<BHxxIxxxxB', bytes(values[0:14]))
     retDict = {}
-    retDict["valid"] = (data[0] == 0x1e)
-    retDict["weight"] = data[1]
+    retDict["valid"] = (data[0] == 0x1d)
+    # Weight is reported in 10g. Hence, divide by 100.0
+    # To force results to be floats: devide by float.
+    retDict["weight"] = data[1] / 100.0
     retDict["timestamp"] = sanitize_timestamp(data[2])
     retDict["person"] = data[3]
     return retDict
