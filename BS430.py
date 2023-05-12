@@ -55,6 +55,7 @@ def connect_device(ble_address):
         except pygatt.exceptions.NotConnectedError:
             log.warning('Failed to connect, retrying...')
             time.sleep(1)
+    handle_command = device.get_handle(Char_command)  # Move this line inside the connect_device() function
     return device
 
 handle_command = device.get_handle(Char_command)
