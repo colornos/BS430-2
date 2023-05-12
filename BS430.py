@@ -113,6 +113,8 @@ if not init_ble_mode():
 adapter = pygatt.backends.GATTToolBackend()
 adapter.start()
 
+device = None
+
 while True:
     wait_for_device(device_name)
     device = connect_device(ble_address)
