@@ -3,7 +3,8 @@ import sys
 import time
 from configparser import ConfigParser
 from struct import pack
-
+import os
+import importlib
 import pygatt
 
 # Relevant characteristics submitted by the scale
@@ -97,11 +98,19 @@ else:
 # Global variable to store the last weight timestamp
 last_weight_timestamp = 0
 
+plugins = []
+
+for plugin_name in os.listdir(path):
+    if plugin_name.endswith(".py"):
+        module_name = plugin_name[:-3]
+        module = importlib.import_module(f"{path.replace('/', '.')}{module_name}")
+        plugins.append(module)
+
 def processIndication(handle, data):
     global weightdata, last_weight_timestamp
 
     if handle == handle_weight:
-        weight = decodeWeightData(data)
+        weight = decodeWeight(handle, data)  # Change this line
         if weight['timestamp'] > last_weight_timestamp:
             last_weight_timestamp = weight['timestamp']
             weightdata = [weight]  # Replace weightdata with the new weight
@@ -161,7 +170,8 @@ while True:
                 # Process the most recent weight data
                 if weightdata:
                     log.info(f"Most recent weight data: {weightdata[0]}")
+                    for plugin in plugins:
+                        plugin.process_data(weightdata[0])
                 else:
                     log.error('Unreliable data received. Unable to process')
-    time.sleep(5)
 adapter.stop()
