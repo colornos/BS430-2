@@ -31,7 +31,7 @@ def decodeWeight(handle, values):
     # To force results to be floats: devide by float.
     retDict["weight"] = data[1] / 100.0
     retDict["timestamp"] = sanitize_timestamp(data[2])
-    retDict["person"] = data[3]
+    
     return retDict
 
 def processIndication(handle, values):
