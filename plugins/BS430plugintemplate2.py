@@ -14,7 +14,7 @@ class Plugin:
         # put any commands here you would like to be run to initialize your plugin
         return
 
-    def execute(self, config, weightdata):
+    def execute(self, config, persondata, weightdata):
         # self.weightdata = weightdata
         # --- part of plugin skeleton
         log = logging.getLogger(__name__)
