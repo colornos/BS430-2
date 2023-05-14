@@ -17,9 +17,6 @@ from mfrc522 import SimpleMFRC522
 Char_person = '00008a82-0000-1000-8000-00805f9b34fb'  # person data
 Char_weight = '00008a21-0000-1000-8000-00805f9b34fb'  # weight data
 Char_command = '00008a81-0000-1000-8000-00805f9b34fb'  # command register
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-log = logging.getLogger(__name__)
 
 def decodePerson(handle, values):
 
@@ -110,10 +107,74 @@ def init_ble_mode():
     else:
         log.info(err)
         return False
+    
+'''
+Main program loop
+'''
+# Read .ini file and set plugins-folder
+config = ConfigParser()
+config.read('BS430.ini')
+path = "plugins/"
+plugins = {}
+
+# set up logging
+numeric_level = getattr(logging,
+                        config.get('Program', 'loglevel').upper(),
+                        None)
+if not isinstance(numeric_level, int):
+    raise ValueError('Invalid log level: %s' % loglevel)
+logging.basicConfig(level=numeric_level,
+                    format='%(asctime)s %(levelname)-8s %(funcName)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename=config.get('Program', 'logfile'),
+                    filemode='w')
+log = logging.getLogger(__name__)
+ch = logging.StreamHandler(sys.stdout)
+ch.setLevel(numeric_level)
+formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(funcName)s %(message)s')
+ch.setFormatter(formatter)
+log.addHandler(ch)
+
+# Load configured plugins
+if config.has_option('Program', 'plugins'):
+    config_plugins = config.get('Program', 'plugins').split(',')
+    config_plugins = [plugin.strip(' ') for plugin in config_plugins]
+    log.info('Configured plugins: %s' % ', '.join(config_plugins))
+
+    sys.path.insert(0, path)
+    for plugin in config_plugins:
+        log.info('Loading plugin: %s' % plugin)
+        mod = __import__(plugin)
+        plugins[plugin] = mod.Plugin()
+    log.info('All plugins loaded.')
+else:
+    log.info('No plugins configured.')
+sys.path.pop(0)
+
+# Load scale information from .ini-file
+ble_address = config.get('Scale', 'ble_address')
+device_name = config.get('Scale', 'device_name')
+device_model = config.get('Scale', 'device_model')
+
+# Set BLE address type and time offset, depending on scale model
+if device_model == 'BS410':
+    addresstype = pygatt.BLEAddressType.public
+    # On BS410 time=0 equals 1/1/2010. 
+    # time_offset is used to convert to unix standard
+    time_offset = 1262304000
+elif device_model == 'BS444':
+    addresstype = pygatt.BLEAddressType.public
+    # On BS444 time=0 equals 1/1/2010. 
+    # time_offset is used to convert to unix standard
+    time_offset = 1262304000
+else:
+    addresstype = pygatt.BLEAddressType.random
+    time_offset = 0
+
 '''
 Start BLE comms and run that forever
 '''
-log.info('BS440 Started')
+log.info('BS430 Started')
 if not init_ble_mode():
     sys.exit()
 
