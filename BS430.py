@@ -17,6 +17,9 @@ from mfrc522 import SimpleMFRC522
 Char_person = '00008a82-0000-1000-8000-00805f9b34fb'  # person data
 Char_weight = '00008a21-0000-1000-8000-00805f9b34fb'  # weight data
 Char_command = '00008a81-0000-1000-8000-00805f9b34fb'  # command register
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 def decodePerson(handle, values):
 
